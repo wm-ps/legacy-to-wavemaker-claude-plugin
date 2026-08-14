@@ -1,0 +1,19 @@
+{
+  "name": "legacy-to-wavemaker",
+  "displayName": "Legacy to WaveMaker",
+  "description": "Tools for migrating legacy web apps to WaveMaker 11 and hand-authoring WaveMaker project files.",
+  "version": "1.0.0",
+  "owner": {
+    "name": "WMshopbit migration"
+  },
+  "plugins": [
+    {
+      "name": "wavemaker",
+      "source": "./wavemaker",
+      "description": "Conventions, a migration command, and an authoring agent for moving legacy JSP/servlet (or other) apps to WaveMaker 11 and hand-editing WaveMaker files.",
+      "version": "1.0.0",
+      "author": { "name": "WMshopbit migration" },
+      "keywords": ["wavemaker", "migration", "low-code", "jsp", "servlet"]
+    }
+  ]
+}

@@ -1,0 +1,97 @@
+---
+name: wavemaker-migration
+description: >-
+  Conventions and rules for migrating legacy web apps (JSP/servlet, PHP, .NET, or any
+  server-rendered app) to WaveMaker 11 (React/low-code), AND for hand-authoring any WaveMaker
+  project files outside WaveMaker Studio. Use this skill whenever the task involves migrating a
+  legacy app to WaveMaker; creating or editing WaveMaker pages/partials by hand (`.html` wm-markup,
+  `.variables.json`, `.js`, `.css`); writing WaveMaker LiveVariables, LiveForms, LiveTables,
+  ServiceVariables, or navigation actions; authoring custom `@ExposeToClient` Java services;
+  building design-token themes or component variants (`design-tokens/overrides/**`); or configuring
+  WaveMaker security (intercept-urls, roles query, auth providers). Trigger it even when the user
+  just says "WaveMaker", "wm-", "LiveVariable", "design tokens", "shopbit", or names a WaveMaker
+  file — hand-authored WaveMaker markup has many non-obvious rules that are easy to get wrong.
+---
+
+# WaveMaker Migration & Hand-Authoring Conventions
+
+WaveMaker 11 apps are normally built in WaveMaker Studio (a visual designer that generates the
+files). When migrating a legacy app or editing a WaveMaker project **by hand**, the generated file
+formats have many non-obvious rules — get one wrong and Studio rejects the file or the page renders
+blank. This skill captures the rules validated against real WaveMaker Studio output.
+
+**The full ruleset lives in five topic references — open the one(s) relevant to your task before
+authoring files.** The most-often-wrong rules are summarized below; consult the matching reference
+for complete detail, JSON shapes, and examples.
+
+| Reference | Covers (original §) |
+|---|---|
+| [`references/pages-and-markup.md`](references/pages-and-markup.md) | Page shell, `wm-list` templates, item binding, pipes, on-click/`.navigate()`, layout & sizing, static list data, plan-first workflow (§0–§4, §10–§12) |
+| [`references/data-variables.md`](references/data-variables.md) | LiveVariable read=POST, column types, custom Java services, ServiceVariables & app-state, LiveForm/LiveTable CRUD, runtime filtering (§5, §7, §13–§16) |
+| [`references/security.md`](references/security.md) | intercept-urls, page vs service ACLs, custom roles query, client auth state (§6) |
+| [`references/design-tokens.md`](references/design-tokens.md) | Theme tokens, palette edits, component variants / "appearances" (§8–§9) |
+| [`references/migration-map.md`](references/migration-map.md) | Legacy→WaveMaker mapping table + the pre-flight checklist (§17 + checklist) |
+
+## Migration strategy — map to native first, custom code last
+
+Most legacy server code becomes **native WaveMaker**, not custom code. Before writing anything, place
+each legacy feature in the mapping table (reference §17). The high-value moves:
+
+- **JSP/view page** → WaveMaker page (`.html` + `.js` + `.css` + `.variables.json`)
+- **Servlet that lists/reads** → **LiveVariable** (`read`) bound to the generated DB CRUD API
+- **DAO + hand-written SQL** → generated CRUD REST API (this also erases the SQL-injection surface)
+- **Servlet doing CRUD** → **LiveForm/LiveTable** or the entity API `create/update/delete`
+- **Search / category / `LIKE` filter** → LiveVariable `filterExpressions` + `.update()` (reference §16)
+- **Non-CRUD servlet (checkout, business logic)** → custom `@ExposeToClient` Java service + a
+  ServiceVariable (reference §13–§14)
+- **HTTP session object (cart)** → app-scoped `wm.Variable` + `App.*` helpers (reference §14)
+- **Login + session + role check** → DB security provider + `wm-login` + roles query (reference §6)
+
+## Critical rules that are easy to get wrong
+
+These are the mistakes that cost the most rework. Full context in the reference.
+
+1. **Page shell** — `wm-header` and `wm-footer` are **direct children of `wm-page`**, NOT nested in
+   `wm-content`; no `wm-left-panel`; nav lives in the `header` partial; wrap the body in one root
+   container; page-content `columnwidth="12"`. (§0)
+2. **`wm-list` item template** — use `<wm-listtemplate ...>` (Studio-native) or
+   `<ng-template #listtemplate="" let-item="item" let-$index="index">` — note the reference name is
+   **lowercase `#listtemplate=""`**, not camelCase. (§1)
+3. **Item binding** — `bind:<Var>.dataSet[$i].field` (indexed, drop the `Variables.` prefix inside
+   the template) or `bind:item.field`. (§2)
+4. **No string concatenation in bind expressions** — WaveMaker has no `+`. Use pipes:
+   `bind:x | prefix:'$'`, `bind:x | suffix:' items'` (chainable, static args only). (§3)
+5. **Navigation uses `.navigate()`**, not `.invoke()`: `Actions.goToPage_Shop.navigate()`; params via
+   `.navigate({productId: id})`, read on the target with `Page.pageParams`. (§4)
+6. **A LiveVariable read is a POST** to `/{Entity}/filter` — so anonymous access needs the service
+   permitted for **POST** (`"httpMethod": null` in intercept-urls; a GET-only rule 401s). Page ACL and
+   service ACL are separate. (§5–§6)
+7. **Roles query** (custom): placeholder is **`:username`** (lowercase), `queryType` is
+   **`"NATIVE_SQL"`**, and clear `rolePropertyName`/`roleColumnName` to `""`. (§6c)
+8. **Column type for double is `"double"`** (not `float`) in a LiveVariable `propertiesMap`. (§7)
+9. **Styling is via component variants** — styled widgets carry **both** `variant="<name>"` and
+   `class="<component>-<name>"`; variants are defined in
+   `design-tokens/overrides/components/<comp>/<comp>.json` under `appearances`. Sizing uses
+   `width/height = fill|hug|%|px`. Palette edits go in **both** `app.override.css` `:root` and
+   `color.light.json`. (§8–§10)
+10. **Custom Java service** — `@ExposeToClient` class; method name prefix sets the HTTP verb; autowire
+    generated services with `@Qualifier("<dbservice>.<Entity>Service")`; wrap in
+    `@Transactional("<dbservice>TransactionManager")`; Studio generates the controller +
+    `javaservice-rest-patch.json`. Call it from a page via a ServiceVariable
+    (`setInput`/`invoke`). (§13–§14)
+
+## Working method
+
+- **Register** new pages in `pages/pages-config.json` and navigation actions in `app.variables.json`.
+- **New pages/services must be created in WaveMaker Studio** (or via a full project import) before
+  editing them by hand; custom Java code can be authored locally. Studio regenerates
+  `design-tokens/app.override.css` from the `overrides/**` token JSON on import.
+- **Cannot preview a WaveMaker app without Studio.** Author files to spec, JSON-validate everything,
+  and treat a Studio import as the verification step. Model new pages on the existing samplePage /
+  Login page and on entities in the imported DB's published data model.
+- **Run the pre-flight checklist** in [`references/migration-map.md`](references/migration-map.md)
+  before handing off any page.
+
+When in doubt about an exact JSON shape or a widget attribute, open the matching topic reference
+(see the table above) and match the documented example rather than guessing — hand-authored
+WaveMaker files are unforgiving of small format errors.
