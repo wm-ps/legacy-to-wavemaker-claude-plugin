@@ -2,7 +2,7 @@
 name: wavemaker-migration
 description: >-
   Conventions and rules for migrating legacy web apps (JSP/servlet, PHP, .NET, or any
-  server-rendered app) to WaveMaker 11 (React/low-code), AND for hand-authoring any WaveMaker
+  server-rendered app) to WaveMaker AI (React/low-code), AND for hand-authoring any WaveMaker
   project files outside WaveMaker Studio. Use this skill whenever the task involves migrating a
   legacy app to WaveMaker; creating or editing WaveMaker pages/partials by hand (`.html` wm-markup,
   `.variables.json`, `.js`, `.css`); writing WaveMaker LiveVariables, LiveForms, LiveTables,
@@ -15,7 +15,7 @@ description: >-
 
 # WaveMaker Migration & Hand-Authoring Conventions
 
-WaveMaker 11 apps are normally built in WaveMaker Studio (a visual designer that generates the
+WaveMaker AI apps are normally built in WaveMaker Studio (a visual designer that generates the
 files). When migrating a legacy app or editing a WaveMaker project **by hand**, the generated file
 formats have many non-obvious rules — get one wrong and Studio rejects the file or the page renders
 blank. This skill captures the rules validated against real WaveMaker Studio output.

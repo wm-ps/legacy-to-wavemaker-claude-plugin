@@ -1,7 +1,7 @@
 # Legacy → WaveMaker (Claude Code plugin)
 
 A [Claude Code](https://claude.com/claude-code) plugin marketplace for migrating legacy web apps
-(JSP/servlet, PHP, .NET, or any server-rendered app) to **WaveMaker 11** and hand-authoring
+(JSP/servlet, PHP, .NET, or any server-rendered app) to **WaveMaker AI** and hand-authoring
 WaveMaker project files outside WaveMaker Studio, using conventions validated against real Studio
 output.
 

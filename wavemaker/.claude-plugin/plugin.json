@@ -2,7 +2,7 @@
   "name": "wavemaker",
   "displayName": "WaveMaker Migration & Authoring",
   "version": "1.0.0",
-  "description": "Migrate legacy JSP/servlet (or other) web apps to WaveMaker 11 and hand-author WaveMaker page/variable/service/design-token files following Studio-validated conventions. Bundles the wavemaker-migration skill, a /migrate-to-wavemaker command, and a wavemaker-authoring agent.",
+  "description": "Migrate legacy JSP/servlet (or other) web apps to WaveMaker AI and hand-author WaveMaker page/variable/service/design-token files following Studio-validated conventions. Bundles the wavemaker-migration skill, a /migrate-to-wavemaker command, and a wavemaker-authoring agent.",
   "author": { "name": "WMshopbit migration" },
   "keywords": ["wavemaker", "migration", "low-code", "jsp", "servlet", "design-tokens"],
   "license": "MIT"

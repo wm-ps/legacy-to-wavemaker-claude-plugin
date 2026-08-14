@@ -1,6 +1,6 @@
 # WaveMaker Migration & Authoring (Claude Code plugin)
 
-Everything needed to migrate a legacy web app (JSP/servlet, or other) to **WaveMaker 11** and to
+Everything needed to migrate a legacy web app (JSP/servlet, or other) to **WaveMaker AI** and to
 hand-author WaveMaker project files outside WaveMaker Studio, using conventions validated against
 real Studio output.
 

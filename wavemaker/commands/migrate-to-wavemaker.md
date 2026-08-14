@@ -1,10 +1,10 @@
 ---
-description: Plan and start migrating a legacy app (or one feature/page) to WaveMaker 11, following the wavemaker-migration conventions.
+description: Plan and start migrating a legacy app (or one feature/page) to WaveMaker AI, following the wavemaker-migration conventions.
 argument-hint: [path-to-legacy-app-or-feature]
 allowed-tools: Read, Grep, Glob, Bash, Edit, Write, Skill
 ---
 
-You are migrating a legacy web app to **WaveMaker 11**. First invoke the `wavemaker-migration`
+You are migrating a legacy web app to **WaveMaker AI**. First invoke the `wavemaker-migration`
 skill so the full conventions and the legacy→WaveMaker mapping are loaded, then follow them.
 
 Target of this migration: **$ARGUMENTS** (if empty, ask the user what legacy app, feature, or page
