@@ -77,6 +77,39 @@ public class MyJavaService {
 }
 ```
 
+### 13a. Wiring a **hand-authored** Java service (the step Studio does silently)
+
+When Studio creates a Java service it also registers its beans. If you author the service **by hand**
+(no Studio round-trip), the class exists but **no bean is ever created**, so the ServiceVariable call
+404/500s and autowiring the service into its controller fails. You must add the registration Studio
+would have generated:
+
+- **`services/<Service>/src/service_<Service>.spring.xml`** — this is the missing piece.
+  `WEB-INF/project-services.xml` imports `classpath*:service_*.spring.xml`, so a service with no such
+  file is never scanned. Component-scan the service's base package:
+  ```xml
+  <beans xmlns="http://www.springframework.org/schema/beans"
+         xmlns:context="http://www.springframework.org/schema/context"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                             http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+      <context:component-scan base-package="com.<pkg>.<service>"/>
+  </beans>
+  ```
+- **Don't `@Qualifier` the service into its own controller.** Component-scan names the `@ExposeToClient`
+  bean by its decapitalized class name (`shopService`), so a controller
+  `@Autowired @Qualifier("<Service>.<Service>")` won't resolve — there's exactly one bean, so plain
+  `@Autowired private ShopService shopService;` is correct. (The `@Qualifier("<dbservice>.<Entity>Service")`
+  on the *DB* services **is** still required — those beans are explicitly named.)
+- **`designtime/service-info.json`** (`"type": "JavaService"`, `serviceClassNames`) and
+  `javaservice-rest-patch.json` are design-time metadata for Studio's UI; the runtime endpoint is
+  served by the `@RestController` regardless. Author them for a clean Studio import, but the
+  `spring.xml` above is what actually makes the service *run*.
+
+> Reliable path: create the service shell in Studio (it emits `service_<Service>.spring.xml`,
+> `service-info.json`, and the controller correctly), then paste your logic into `<Service>.java`.
+> Hand-author the whole service only when Studio isn't available — and then add the `spring.xml`.
+
 ---
 
 ## 14. ServiceVariable (call a Java service) & client app-state

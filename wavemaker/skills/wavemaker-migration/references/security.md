@@ -63,3 +63,22 @@ visibility with `show="bind:App.Variables.loggedInUser.dataSet.isAuthenticated =
 `== false`). Login/logout: `App.Variables.loginAction` / `App.Variables.logoutAction.invoke()`.
 In a custom Java service, get the caller via the autowired `SecurityService`
 (`securityService.isAuthenticated()`, `securityService.getLoggedInUser().getUserId()`).
+
+### 6e. Don't hand-author the auth **provider block** — use the Studio wizard
+§6c documents the roles-query *fields*, but the surrounding `authProviders` object in `auth-info.json`
+(the DATABASE provider wrapper, encoder, datasource/entity binding, `activeAuthProviderTypes`) is a
+**Studio-generated, version-specific shape**. A malformed provider block makes the app **fail to
+deploy** — the visible symptom is the preview container starting then tearing down (a
+`contextDestroyed` / `JavaBeanBinderCacheCleanupListener` NPE at undeploy is teardown noise, not the
+cause; the real `ERROR`/`Caused by:` is earlier at startup).
+
+So split the security work:
+- **Hand-author** `intercept-urls.json` and `roles.json` (stable, simple shapes — §6a–§6c) and the
+  roles-query SQL.
+- **Generate the provider via Studio → Security**: enable security, pick **Database** login provider,
+  bind the user entity (username/password fields), set the password encoder to match existing data
+  (legacy = **plaintext**), and paste the roles query from §6c. Studio writes the correct
+  `auth-info.json` block.
+- If you must ship before that Studio pass, leave `auth-info.json` at the safe baseline
+  (`"enforceSecurity": false`, `"authProviders": []`) so the app still deploys; the prepared
+  `intercept-urls`/`roles` activate the moment security is enabled.

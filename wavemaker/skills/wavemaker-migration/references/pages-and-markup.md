@@ -126,6 +126,32 @@ WaveMaker bind expressions do **not** support JS `+` string concatenation. Use f
 
 ---
 
+## 3a. Page `.html` is parsed as XML — two attribute traps
+
+Studio parses page markup as XML, so an attribute *value* or *name* that isn't XML-legal makes the
+whole page fail to load (often silently → blank page). Two mistakes are easy to make in `show`,
+`disabled`, and `bind:` expressions:
+
+1. **No `<` or `<=` inside an attribute value.** `<` opens a tag in XML, so
+   `show="bind:...productAmount <= 0"` breaks the parse. `>` / `>=` are fine. Rewrite with `==`, or
+   flip the operands so only `>`/`>=` appear:
+   | ❌ Breaks XML | ✅ Works |
+   |---|---|
+   | `show="bind:x.amount <= 0"` | `show="bind:x.amount == 0"` |
+   | `disabled="bind:list.length < 1"` | `disabled="bind:list.length == 0"` |
+
+2. **`bind:` goes in the value, never the attribute name.** `bind:datavalue="bind:..."` makes the
+   parser read `bind:` as an XML **namespace prefix** → `unbound prefix` error. Bind through the
+   value only: `datavalue="bind:AccountData.dataSet[0].accountName"`. Inside a **LiveForm**, don't
+   bind fields at all — `wm-form-field name="accountEmail"` auto-binds to the dataset field whose
+   name matches.
+
+> Tip when hand-authoring: run every page through an XML well-formedness check (e.g.
+> `python3 -c "import xml.etree.ElementTree as ET; ET.parse('Page.html')"`) before handing off —
+> it catches both traps instantly.
+
+---
+
 ## 4. List `on-click` signature
 
 The handler receives **`($event, widget, $data)`** where **`$data` is the clicked item**:
