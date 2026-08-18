@@ -17,6 +17,11 @@ Do this:
    `mvn wavemaker-workspace:init` steps and let them authenticate; then you drive `pull`/`push`/`sync`
    each round so they can watch output in Studio and chat corrections. Never handle their password/token
    or run `init` yourself. If they decline, fall back to export → user imports, and verify in Studio.
+0b. **Get the base project and PIN its version** — ask for the base WaveMaker project, then read its
+   version (`.wmproject.properties` `studioProjectUpgradeVersion`, and the `wavemaker-app-parent`
+   version in `pom.xml`). The conventions are validated against `1115.11`; if the base differs, grep
+   the base's own Studio-generated files for exact shapes instead of trusting the references. Tell the
+   user the detected version. (See the skill's "Step 0b".)
 1. **Load the rules** — invoke the `wavemaker-conventions` skill and read the relevant topic
    reference(s) under `references/` (pages-and-markup, data-variables, security, design-tokens,
    migration-map) before authoring any file.

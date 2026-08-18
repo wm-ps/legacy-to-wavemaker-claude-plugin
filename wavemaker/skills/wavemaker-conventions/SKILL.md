@@ -47,6 +47,24 @@ token, and never run `init`/authenticate on their behalf. The user authenticates
 only run `pull`/`push`/`sync` against the channel they opened. If sync isn't set up, fall back to
 exporting the project and having the user import it, and still verify in Studio.
 
+## Step 0b — Get the base project and PIN its WaveMaker version
+
+**Always ask the user for the base WaveMaker project (a Studio-exported/opened project) before
+authoring.** You can't hand-author into nothing — new pages/services are created in Studio, and you
+model new files on the base project's existing pages, its imported DB data model, and its
+`design-tokens/overrides/**`.
+
+**These rules are validated against WaveMaker `1115.11` — versions drift, so read the base project's
+version first and treat the base's OWN generated files as ground truth for anything version-sensitive:**
+- `.wmproject.properties` → `studioProjectUpgradeVersion` (e.g. `1115.11`).
+- `pom.xml` → the `ai.wavemaker.app:wavemaker-app-parent` `<version>` and the
+  `wavemaker.app.runtime.ui.version` property.
+
+If the base differs from 1115.11, don't blindly trust these references for exact file shapes
+(LiveVariable/ServiceVariable JSON, page shell, security enums, service wiring). Instead grep the
+base project's existing Studio-generated pages/services and copy those shapes — a real generated file
+from the target version always beats a documented example. Tell the user the version you detected.
+
 **The full ruleset lives in five topic references — open the one(s) relevant to your task before
 authoring files.** The most-often-wrong rules are summarized below; consult the matching reference
 for complete detail, JSON shapes, and examples.
