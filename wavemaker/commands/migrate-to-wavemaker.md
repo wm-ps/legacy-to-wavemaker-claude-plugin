@@ -1,10 +1,10 @@
 ---
-description: Plan and start migrating a legacy app (or one feature/page) to WaveMaker AI, following the wavemaker-migration conventions.
+description: Plan and start migrating a legacy app (or one feature/page) to WaveMaker AI, following the wavemaker-conventions conventions.
 argument-hint: [path-to-legacy-app-or-feature]
 allowed-tools: Read, Grep, Glob, Bash, Edit, Write, Skill
 ---
 
-You are migrating a legacy web app to **WaveMaker AI**. First invoke the `wavemaker-migration`
+You are migrating a legacy web app to **WaveMaker AI**. First invoke the `wavemaker-conventions`
 skill so the full conventions and the legacy→WaveMaker mapping are loaded, then follow them.
 
 Target of this migration: **$ARGUMENTS** (if empty, ask the user what legacy app, feature, or page
@@ -12,7 +12,12 @@ to migrate, and where the WaveMaker project lives).
 
 Do this:
 
-1. **Load the rules** — invoke the `wavemaker-migration` skill and read the relevant topic
+0. **Connect Studio ⇄ local sync FIRST** — before authoring anything, ask the user whether the
+   `wavemaker-workspace` IDE sync is set up (see the skill's "Step 0"). If not, give them the one-time
+   `mvn wavemaker-workspace:init` steps and let them authenticate; then you drive `pull`/`push`/`sync`
+   each round so they can watch output in Studio and chat corrections. Never handle their password/token
+   or run `init` yourself. If they decline, fall back to export → user imports, and verify in Studio.
+1. **Load the rules** — invoke the `wavemaker-conventions` skill and read the relevant topic
    reference(s) under `references/` (pages-and-markup, data-variables, security, design-tokens,
    migration-map) before authoring any file.
 2. **Map, don't rewrite** — for each legacy feature, place it in the mapping table in

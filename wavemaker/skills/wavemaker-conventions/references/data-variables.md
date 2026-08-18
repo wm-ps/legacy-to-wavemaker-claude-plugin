@@ -63,6 +63,7 @@ edit the code. Location: `services/<Service>/src/com/<pkg>/<Service>.java`.
 
 Example shape (see `MyJavaService.placeOrder`):
 ```java
+@Service("MyJavaService.MyJavaService")   // REQUIRED — @ExposeToClient alone does not create a bean
 @ExposeToClient
 public class MyJavaService {
   @Transactional("jsp_servlet_ecommerceTransactionManager")
@@ -84,6 +85,18 @@ When Studio creates a Java service it also registers its beans. If you author th
 404/500s and autowiring the service into its controller fails. You must add the registration Studio
 would have generated:
 
+- **`pom.xml` — register the service source root (the MOST-missed step; the app won't build/wire without it).**
+  WaveMaker compiles service code from an explicit `build-helper-maven-plugin` `add-source` list — NOT
+  by scanning `services/`. A hand-added service folder that isn't in that list has its `spring.xml`
+  (and classes) never placed on the classpath, so the `service_*.spring.xml` wildcard finds nothing →
+  `NoSuchBeanDefinitionException` for the service at context init. Add it next to the existing services:
+  ```xml
+  <sources>
+    <source>services/<dbservice>/src</source>
+    <source>services/securityService/src</source>
+    <source>services/<Service>/src</source>   <!-- your custom Java service -->
+  </sources>
+  ```
 - **`services/<Service>/src/service_<Service>.spring.xml`** — this is the missing piece.
   `WEB-INF/project-services.xml` imports `classpath*:service_*.spring.xml`, so a service with no such
   file is never scanned. Component-scan the service's base package:
@@ -96,11 +109,16 @@ would have generated:
       <context:component-scan base-package="com.<pkg>.<service>"/>
   </beans>
   ```
-- **Don't `@Qualifier` the service into its own controller.** Component-scan names the `@ExposeToClient`
-  bean by its decapitalized class name (`shopService`), so a controller
-  `@Autowired @Qualifier("<Service>.<Service>")` won't resolve — there's exactly one bean, so plain
-  `@Autowired private ShopService shopService;` is correct. (The `@Qualifier("<dbservice>.<Entity>Service")`
-  on the *DB* services **is** still required — those beans are explicitly named.)
+- **The service class MUST carry a Spring stereotype — `@ExposeToClient` alone does NOT create a bean.**
+  Verified against Studio output (v1115.11): the generated DB services annotate their impls
+  `@Service("<dbservice>.<Entity>Service")`, and a custom Java service needs the same. Annotate the
+  class **`@Service("<Service>.<Service>")`** (keep `@ExposeToClient` alongside it). Omitting the
+  stereotype means component-scan registers only the `@RestController`, and the app **fails at context
+  init** with `NoSuchBeanDefinitionException: No qualifying bean of type '...<Service>'` on the
+  controller's `@Autowired` field. Inject into the controller **by type** — plain
+  `@Autowired private ShopService shopService;`, no `@Qualifier` on its own single bean. (The
+  `@Qualifier("<dbservice>.<Entity>Service")` on the *DB* services **is** still required — those beans
+  are explicitly named.)
 - **`designtime/service-info.json`** (`"type": "JavaService"`, `serviceClassNames`) and
   `javaservice-rest-patch.json` are design-time metadata for Studio's UI; the runtime endpoint is
   served by the `@RestController` regardless. Author them for a clean Studio import, but the
@@ -166,3 +184,11 @@ Page.Variables.ShopProductData.update();
 `matchMode`: `equals` | `startignorecase` | `anywhereignorecase`. Single-record read (product
 detail) = a LiveVariable with `maxResults:1`, `startUpdate:false`, filtered by PK in `onReady`, then
 `.update()`. (Confirm the exact runtime filter API on first Studio import.)
+
+**Do NOT write a static `filterExpressions` block into a hand-authored `.variables.json`.** The
+runtime parses static filters at variable-registration time (`processFilterExpBindNode`), and a
+hand-authored block fails the page load with `TypeError: Cannot read properties of undefined
+(reading 'rules')` — the page never renders. Instead set every filter in `onReady` JS (as above) on
+a variable with `startUpdate:false`, and call `.update()`. Runtime-assigned `filterExpressions` skip
+the registration-time parser, so this always works. (Studio may emit static filters, but its exact
+serialized shape is version-specific — don't hand-author it.)

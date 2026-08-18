@@ -33,10 +33,16 @@ entity content URL; always set `pictureplaceholder="resources/images/imagelists/
 ---
 
 ## Quick pre-flight checklist before handing off a page
-- [ ] Page shell: `wm-header` + `wm-content` + `wm-footer` as **direct children of `wm-page`**; nav in
-      the `header` partial; no `wm-left-panel`; page-content `columnwidth="12"`; body in one root container.
+- [ ] Page shell: `wm-header` + `wm-footer` are **direct children of `wm-page`** (full-width header),
+      `wm-content` between them; `wm-page-content` set `width="fill" height="fill" clipcontent="false"
+      overflow="none"` (else the body squeezes to a centered strip). Nav in the `header` partial;
+      page-content `columnwidth="12"`; body in one root container. Verify LAYOUT in Studio preview.
 - [ ] Styled widgets carry both `variant="<name>"` and `class="<component>-<name>"`; each variant
       exists in `design-tokens/overrides/components/<comp>/<comp>.json` `appearances`.
+- [ ] **Design tokens delivered by default (not deferred):** full `overrides/global/**` (color, space,
+      radius, elevation, font) AND `overrides/components/**` sources authored, and the compiled
+      `app.override.css` regenerated to match. Native variants are the deliverable; plain utility CSS
+      is a flagged fallback only.
 - [ ] Sizing via `width/height = fill|hug|%|px`; overlays via `position`/`positionvalue`/`clipcontent`.
 - [ ] List template is `<wm-listtemplate>` or `<ng-template #listtemplate="">` (lowercase); layout props on `<wm-list>`.
 - [ ] Inner bindings use `bind:<Var>.dataSet[$i].field` (or `item.field`) — **no `+`**; text via `| prefix:`/`| suffix:` pipes.

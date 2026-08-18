@@ -33,7 +33,7 @@ permits.
   { "urlPattern": "/services/jsp_servlet_ecommerce/Category/**", "permission": "PermitAll", "roles": [], "httpMethod": null }
 ]
 ```
-`permission` ∈ `PermitAll` | `Authenticated` | `HasRole` (then list role names in `roles`).
+`permission` ∈ `PermitAll` | `Authenticated` | `Role` (then list role names in `roles`).
 
 ### 6c. Custom roles query (DATABASE provider, `auth-info.json`)
 Map DB flags → role names with a native SQL query. The username placeholder is **`:username`**

@@ -5,7 +5,7 @@ hand-author WaveMaker project files outside WaveMaker Studio, using conventions 
 real Studio output.
 
 ## What's inside
-- **Skill `wavemaker-migration`** — the full ruleset, split across five topic references the skill
+- **Skill `wavemaker-conventions`** — the full ruleset, split across five topic references the skill
   routes to on demand: `pages-and-markup` (page shell, `wm-list` templates, binding/pipes,
   `.navigate()`, layout sizing, static data, plan-first workflow), `data-variables` (LiveVariable
   read=POST, column types, custom Java services, ServiceVariables & app-state, LiveForm/LiveTable
@@ -29,4 +29,4 @@ or just start a WaveMaker task and the skill triggers automatically.
 ```bash
 claude --plugin-dir ./legacy-to-wavemaker/wavemaker
 ```
-Invoke `/wavemaker:migrate-to-wavemaker` or the `wavemaker-migration` skill.
+Invoke `/wavemaker:migrate-to-wavemaker` or the `wavemaker-conventions` skill.
