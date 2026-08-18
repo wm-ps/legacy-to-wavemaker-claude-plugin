@@ -24,7 +24,8 @@ blank. This skill captures the rules validated against real WaveMaker Studio out
 
 You cannot preview a WaveMaker app without Studio, so hand-authored files must be verified there. The
 fastest loop is WaveMaker's **`wavemaker-workspace` Maven plugin** (IDE sync, beta): edit locally,
-push, the user refreshes Studio, reports back, repeat — no zip/re-import each round.
+push, the user refreshes Studio, reports back, repeat — no zip/re-import each round. Full detail and
+the dedicated `/wavemaker-sync` command are in [`references/ide-sync.md`](references/ide-sync.md).
 
 **At the very start of any WaveMaker task, ask the user whether Studio⇄local sync is connected. If
 not, give them these one-time steps and let them run them — then you drive the ongoing sync.**
@@ -76,6 +77,7 @@ for complete detail, JSON shapes, and examples.
 | [`references/security.md`](references/security.md) | intercept-urls, page vs service ACLs, custom roles query, client auth state (§6) |
 | [`references/design-tokens.md`](references/design-tokens.md) | Theme tokens, palette edits, component variants / "appearances" (§8–§9) |
 | [`references/migration-map.md`](references/migration-map.md) | Legacy→WaveMaker mapping table + the pre-flight checklist (§17 + checklist) |
+| [`references/ide-sync.md`](references/ide-sync.md) | Studio ⇄ IDE sync via the workspace-sync Maven plugin (`init`/`pull`/`push`/`sync`) — how hand-authored files get into Studio |
 
 ## Migration strategy — map to native first, custom code last
 

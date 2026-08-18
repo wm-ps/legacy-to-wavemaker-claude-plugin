@@ -14,6 +14,8 @@ real Studio output.
   pre-flight checklist). Auto-triggers on WaveMaker/migration tasks.
 - **Command `/migrate-to-wavemaker [target]`** — plans and starts a migration with the conventions
   preloaded.
+- **Command `/wavemaker-sync [project]`** — sets up Studio ⇄ IDE synchronization (adds the
+  workspace-sync Maven plugin + a SYNC.md) for a WaveMaker project.
 - **Agent `wavemaker-authoring`** — a subagent that hand-authors/fixes WaveMaker files to spec and
   JSON-validates them.
 

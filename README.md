@@ -10,7 +10,7 @@ output.
 This repo is a Claude Code **marketplace** (`legacy-to-wavemaker`) containing one plugin
 (`wavemaker`):
 
-- **Skill `wavemaker-migration`** — the full ruleset, split across five topic references the skill
+- **Skill `wavemaker-conventions`** — the full ruleset, split across five topic references the skill
   routes to on demand:
   - `pages-and-markup` — page shell, `wm-list` templates, binding/pipes, `.navigate()`, layout
     sizing, static data, plan-first workflow
@@ -19,8 +19,11 @@ This repo is a Claude Code **marketplace** (`legacy-to-wavemaker`) containing on
   - `security` — intercept-urls, page vs service ACLs, custom roles query, client auth state
   - `design-tokens` — theme tokens, palette edits, component variants ("appearances")
   - `migration-map` — legacy→WaveMaker mapping table + a pre-flight checklist
+  - `ide-sync` — Studio ⇄ IDE sync via the workspace-sync Maven plugin (`init`/`pull`/`push`/`sync`)
 - **Command `/migrate-to-wavemaker [target]`** — plans and starts a migration with the conventions
   preloaded.
+- **Command `/wavemaker-sync [project]`** — sets up Studio ⇄ IDE synchronization (adds the
+  workspace-sync Maven plugin + a SYNC.md) for a WaveMaker project.
 - **Agent `wavemaker-authoring`** — a subagent that hand-authors/fixes WaveMaker files to spec and
   JSON-validates them.
 
@@ -47,8 +50,9 @@ claude --plugin-dir ./wavemaker
 wavemaker/                         # the plugin
   .claude-plugin/plugin.json
   README.md
-  skills/wavemaker-migration/      # SKILL.md + references/*.md
+  skills/wavemaker-conventions/      # SKILL.md + references/*.md
   commands/migrate-to-wavemaker.md
+  commands/wavemaker-sync.md
   agents/wavemaker-authoring.md
 ```
 
