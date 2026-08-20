@@ -5,7 +5,7 @@ allowed-tools: Read, Grep, Glob, Bash, Edit, Write, Skill
 ---
 
 Set up **WaveMaker Studio ⇄ IDE sync** for a WaveMaker project using the WorkSpace Sync Maven
-plugin. First invoke the `wavemaker-migration` skill and read
+plugin. First invoke the `wavemaker-conventions` skill and read
 `references/ide-sync.md` for the exact plugin coordinates, goals, and gotchas.
 
 Target project: **$ARGUMENTS** (if empty, ask where the WaveMaker project lives — the folder with
@@ -13,7 +13,7 @@ Target project: **$ARGUMENTS** (if empty, ask where the WaveMaker project lives 
 
 Do this:
 
-1. **Load the rules** — invoke the `wavemaker-migration` skill; read `references/ide-sync.md`.
+1. **Load the rules** — invoke the `wavemaker-conventions` skill; read `references/ide-sync.md`.
 2. **Confirm it's a WaveMaker project** — check for `pom.xml` + `.wmproject.properties`; read the
    project's display name from `.wmproject.properties` (you'll pick it during `init`).
 3. **Add the plugin to `pom.xml`** (if not already present) — pin the version via a property and

@@ -10,7 +10,7 @@ output.
 This repo is a Claude Code **marketplace** (`legacy-to-wavemaker`) containing one plugin
 (`wavemaker`):
 
-- **Skill `wavemaker-migration`** — the full ruleset, split across five topic references the skill
+- **Skill `wavemaker-conventions`** — the full ruleset, split across five topic references the skill
   routes to on demand:
   - `pages-and-markup` — page shell, `wm-list` templates, binding/pipes, `.navigate()`, layout
     sizing, static data, plan-first workflow
@@ -50,7 +50,7 @@ claude --plugin-dir ./wavemaker
 wavemaker/                         # the plugin
   .claude-plugin/plugin.json
   README.md
-  skills/wavemaker-migration/      # SKILL.md + references/*.md
+  skills/wavemaker-conventions/      # SKILL.md + references/*.md
   commands/migrate-to-wavemaker.md
   commands/wavemaker-sync.md
   agents/wavemaker-authoring.md

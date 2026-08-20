@@ -12,17 +12,25 @@ ruleset.) Companion files: [`security.md`](security.md), [`data-variables.md`](d
 
 ## 0. Page shell / layout
 
-Storefront pages use this shell — **`wm-header` and `wm-footer` are DIRECT children of `<wm-page>`,
-NOT nested inside `wm-content`.** No `wm-left-panel`. The **navigation lives in the `header`
-partial** (a two-row header: top bar with search/brand/icons, then a nav row of HOME/ABOUT/SHOP/
-CONTACT anchors). A separate `wm-top-nav content="topnav"` element is *optional* — the shipped/tested
-storefront puts the menu in the header instead, so a bare header+content+footer is the canonical form:
+Storefront pages use this shell — **`wm-header` and `wm-footer` are DIRECT children of `<wm-page>`**
+(header first, footer last), with `<wm-content>` between them. Two rules make or break the layout:
+
+1. **Header/footer as direct children of `wm-page`** so the header spans the FULL page width. Nesting
+   `wm-header` inside `wm-content` constrains it to the content column — the header renders narrow/
+   left-aligned and the page body gets squeezed into the center.
+2. **`wm-page-content` must be `width="fill" height="fill"`** (plus `clipcontent="false" overflow="none"`).
+   Without `width="fill"` the page-content behaves like a fixed Bootstrap column and the whole body
+   collapses to a centered strip.
+
+`wm-left-panel` is optional (Studio's default scaffold includes one as a direct child of `wm-page`;
+omit it for a storefront). Nav lives in the `header` partial.
 
 ```html
 <wm-page name="mainpage" pagetitle="Main">
     <wm-header content="header" name="header1"></wm-header>
     <wm-content name="content">
-        <wm-page-content columnwidth="12" name="mainContent">
+        <wm-page-content columnwidth="12" name="mainContent"
+            width="fill" height="fill" clipcontent="false" overflow="none">
             <!-- page body: wrap everything in one root container -->
             <wm-container direction="column" gap="0" alignment="top-left" width="fill" height="hug"
                 name="pageRoot" class="app-container-default" variant="default">
@@ -33,6 +41,10 @@ storefront puts the menu in the header instead, so a bare header+content+footer 
     <wm-footer content="footer" name="footer1"></wm-footer>
 </wm-page>
 ```
+
+> The header/footer placement here was hard-won: a Studio scratch page can render either arrangement,
+> but for a full-width storefront header the direct-child-of-`wm-page` form + `width="fill"` page-content
+> is the one that lays out correctly. Verify layout in Studio's preview, not just that it compiles.
 
 The `header` partial holds nav (menu anchors use `.navigate()` — see §4):
 ```html
@@ -50,8 +62,11 @@ The `header` partial holds nav (menu anchors use `.navigate()` — see §4):
 ```
 
 ### ❌ Mistakes I made
-- Put `<wm-header>` / `<wm-footer>` **inside** `<wm-content>` → they are direct children of `<wm-page>`.
-- Used `<wm-left-panel>` (left rail) → omit for a storefront.
+- Nested `<wm-header>` inside `<wm-content>` → the header was constrained to the content column
+  (narrow / left-aligned) and the body squeezed to center. Header/footer go **directly under
+  `<wm-page>`** so the header is full-width.
+- Left `wm-page-content` without `width="fill"` → body collapsed to a centered strip. Always set
+  `width="fill" height="fill"` (and `clipcontent="false" overflow="none"`) on `wm-page-content`.
 - Names/attrs: header `name="header1"`, footer `name="footer1"`, content `name="content"`, page-content `columnwidth="12"`.
 - Register partials in `pages/pages-config.json` (`HEADER`, `FOOTER`, and `TOPNAV` only if you use `wm-top-nav`).
 
@@ -175,16 +190,28 @@ Page.openProduct = function ($event, widget, $data) {
 
 ---
 
-## 10. Layout & sizing props (on containers / lists / widgets)
+## 10. Layout & sizing props = WaveMaker **Auto Layout** (on containers / lists / widgets)
 
-- **`width` / `height`**: `fill` (grow), `hug` (fit content), a percentage (`46%`, `100%`), or px (`380px`).
+These `wm-container` attributes **are** WaveMaker's Auto Layout — the visual flexbox system Studio
+writes. When you configure Auto Layout in Studio and look at the VCS diff, the change is exactly these
+attributes being set on the container (no hand-written CSS). So author them directly and you match what
+Studio produces. Docs: https://docs.wavemaker.ai/docs/user-interfaces/web/develop/working-with-layouts/auto-layout
+
+- **`width` / `height`**: `fill` (grow to available space), `hug` (fit content), a percentage
+  (`46%`, `100%`), or px (`380px`). This is Auto Layout's Fill / Hug / Fixed sizing.
 - **`direction`**: `row` | `column`. **`gap`**: a number (`0`,`6`,`8`,`12`,`16`,`24`,`32`) or `auto`
-  (push-apart, e.g. header bar). **`wrap`**: `true|false`.
-- **`alignment`**: `top-left`, `center`, `middle-center`, `middle-left`, `middle-right`, `top-center`,
-  `bottom-left`, … (vertical-horizontal).
+  (space-between / push-apart — use for a header bar's left·center·right distribution). **`wrap`**: `true|false`.
+- **`alignment`**: 9-position grid `top-left`, `center`, `middle-center`, `middle-left`, `middle-right`,
+  `top-center`, `bottom-left`, … (vertical-horizontal). Default `top-left`.
 - **`padding`**: CSS shorthand string, e.g. `padding="40px 64px"`.
+- **`clipcontent`**: overflow — `false` (no scroll, default) or `true` (clip/scroll).
 - **Overlays**: `position="relative"` on the parent + `position="absolute"`
   `positionvalue="0px 0px 0px 0px"` on the child; `clipcontent="true"` to clip to rounded corners.
+
+**Build a page as nested Auto Layout containers**, not utility CSS: an outer `column`, each band a
+`row`/`column` with `width="fill"` and its own `padding`, item grids via `wm-list`
+`itemsperrow="xs-1 sm-2 md-4 lg-4"`. A left·center·right bar = one `row` with `gap="auto"` and three
+child groups (`width="hug"`), so the middle sits centered. Match the legacy layout band-for-band.
 
 ---
 
