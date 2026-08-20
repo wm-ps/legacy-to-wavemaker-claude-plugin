@@ -33,10 +33,16 @@ entity content URL; always set `pictureplaceholder="resources/images/imagelists/
 ---
 
 ## Quick pre-flight checklist before handing off a page
-- [ ] Page shell: `wm-header` + `wm-content` + `wm-footer` as **direct children of `wm-page`**; nav in
-      the `header` partial; no `wm-left-panel`; page-content `columnwidth="12"`; body in one root container.
+- [ ] Page shell: `wm-header` + `wm-footer` are **direct children of `wm-page`** (full-width header),
+      `wm-content` between them; `wm-page-content` set `width="fill" height="fill" clipcontent="false"
+      overflow="none"` (else the body squeezes to a centered strip). Nav in the `header` partial;
+      page-content `columnwidth="12"`; body in one root container. Verify LAYOUT in Studio preview.
 - [ ] Styled widgets carry both `variant="<name>"` and `class="<component>-<name>"`; each variant
       exists in `design-tokens/overrides/components/<comp>/<comp>.json` `appearances`.
+- [ ] **Design tokens delivered by default (not deferred):** full `overrides/global/**` (color, space,
+      radius, elevation, font) AND `overrides/components/**` sources authored, and the compiled
+      `app.override.css` regenerated to match. Native variants are the deliverable; plain utility CSS
+      is a flagged fallback only.
 - [ ] Sizing via `width/height = fill|hug|%|px`; overlays via `position`/`positionvalue`/`clipcontent`.
 - [ ] List template is `<wm-listtemplate>` or `<ng-template #listtemplate="">` (lowercase); layout props on `<wm-list>`.
 - [ ] Inner bindings use `bind:<Var>.dataSet[$i].field` (or `item.field`) — **no `+`**; text via `| prefix:`/`| suffix:` pipes.
@@ -45,7 +51,12 @@ entity content URL; always set `pictureplaceholder="resources/images/imagelists/
 - [ ] New pages registered in `pages/pages-config.json`; nav actions in `app.variables.json`.
 - [ ] Anonymous pages AND their DB services permitted in `intercept-urls.json` with `httpMethod: null`.
 - [ ] Roles query uses `:username` (lowercase) + `queryType: "NATIVE_SQL"`; `rolePropertyName`/`roleColumnName` cleared to `""`; emitted roles exist in `roles.json`.
-- [ ] Column types: `double` (not `float`); relations modeled `isRelated` or left to Studio to regenerate.
+- [ ] LiveVariable JSON = Studio's **full** envelope (data-variables.md §7): `type` is the **entity
+      simple name** (`"Category"`), NOT the FQN (FQN goes in `package`/`fullyQualifiedName`); include
+      `tableName`, `entityName`, `dataBinding`, `matchMode`, `orderBy`, and full per-column metadata
+      (`columnName`/`length`/`precision`/`generator`) copied from the published data model.
+- [ ] Column types: `double` (not `float`); `timestamp` for dates; relations modeled `isRelated` or
+      left to Studio to regenerate (open each LiveVariable once in Studio to regenerate).
 - [ ] Palette edits applied to **both** `app.override.css` `:root` and `color.light.json`.
 - [ ] Non-CRUD backend = `@ExposeToClient` method (`@Transactional`, `@Qualifier`-autowired services); called via a ServiceVariable (`setInput`/`invoke`).
 - [ ] CRUD screens use LiveForm/LiveTable; soft-delete = update a boolean, not a real delete.

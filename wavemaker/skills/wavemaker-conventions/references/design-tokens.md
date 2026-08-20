@@ -7,6 +7,43 @@ mechanism. (Sections §8–§9 of the original ruleset.) Companion files:
 
 ---
 
+## 8·0. FIRST: pull the palette FROM the legacy app (don't invent colors)
+
+A migration must **match the legacy app's look**, so derive the tokens from the legacy source
+rather than picking a fresh palette. Before writing any token file, extract the real values:
+
+- **Find the legacy theme colors.** Grep the legacy static assets for the brand/primary/accent
+  colors and fonts (Bootstrap/Colorlib themes keep them in SCSS variables or a theme CSS):
+  ```bash
+  # hex colors, most-used first
+  grep -rhoE '#[0-9a-fA-F]{6}\b' legacy/**/static/{css,scss} | sort | uniq -c | sort -rn | head
+  # named SCSS/CSS variables (primary/secondary/accent/brand)
+  grep -rniE '(\$|--)(primary|secondary|accent|brand|theme|main)[-a-z]*\s*:' legacy/**/static/{scss,css}
+  # font families
+  grep -rhoE 'font-family:[^;]+;' legacy/**/static/{css,scss} | sort | uniq -c | sort -rn | head
+  ```
+  Also check the theme's Google-Fonts `<link>`/`@import` in the legacy `<head>`/`head.jsp`, and any
+  button/price/link colors (the accent is usually the "add to cart"/price/sale color).
+- **Map them onto the WaveMaker tokens**: legacy brand/header color → `--wm-color-primary`; the
+  accent (CTA/price/links) → `--wm-color-secondary`; page bg → `--wm-color-background`; card bg →
+  `--wm-color-surface`; muted text → `--wm-color-on-surface-variant`; hairlines → `--wm-color-border`.
+  Legacy `font-family` → `--wm-font-family-base`. Convert 6-digit hex to 8-digit `#rrggbbaa`.
+- **State the mapping** to the user (`legacy #xxxxxx → --wm-color-primary`, …) so it's reviewable,
+  and only fall back to a neutral palette if the legacy source genuinely has no theme colors — and
+  say so explicitly.
+- **Chrome backgrounds are PER-SECTION — do NOT paint the header/footer/hero with `--wm-color-primary`.**
+  A brand accent (e.g. a purple used for buttons + active nav) is NOT the header colour. Inspect the
+  legacy page and read each band's ACTUAL background: storefronts commonly have a **white header**, a
+  **distinct hero colour** (teal/mint/image), and a **dark/black footer**, with the accent showing only
+  on buttons, price, and the active nav link. Capture each as its own token
+  (`--wm-color-hero`, `--wm-color-footer`, …) + its own container appearance; give the white/dark bars
+  the right text colour (dark-on-white, light-on-dark). Verify by loading the legacy site and reading
+  computed `background-color` per band — mapping everything to `primary` produces an all-accent app
+  that looks nothing like the original.
+- Then write the values into **both** `app.override.css` `:root` and
+  `overrides/global/color/color.light.json` (§8a). The same rule applies to `space`/`radius`/`font`
+  if the legacy theme has a distinctive scale.
+
 ## 8. Theme / design tokens implementation (`src/main/webapp/design-tokens/`)
 
 `index.html` loads `design-tokens/app.override.css` (do **not** edit index.html — the reference is

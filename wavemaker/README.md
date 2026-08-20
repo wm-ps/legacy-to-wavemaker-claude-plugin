@@ -5,7 +5,7 @@ hand-author WaveMaker project files outside WaveMaker Studio, using conventions 
 real Studio output.
 
 ## What's inside
-- **Skill `wavemaker-migration`** — the full ruleset, split across five topic references the skill
+- **Skill `wavemaker-conventions`** — the full ruleset, split across five topic references the skill
   routes to on demand: `pages-and-markup` (page shell, `wm-list` templates, binding/pipes,
   `.navigate()`, layout sizing, static data, plan-first workflow), `data-variables` (LiveVariable
   read=POST, column types, custom Java services, ServiceVariables & app-state, LiveForm/LiveTable
@@ -14,8 +14,6 @@ real Studio output.
   pre-flight checklist). Auto-triggers on WaveMaker/migration tasks.
 - **Command `/migrate-to-wavemaker [target]`** — plans and starts a migration with the conventions
   preloaded.
-- **Command `/wavemaker-sync [project]`** — sets up Studio ⇄ IDE synchronization (adds the
-  workspace-sync Maven plugin + a SYNC.md) for a WaveMaker project.
 - **Agent `wavemaker-authoring`** — a subagent that hand-authors/fixes WaveMaker files to spec and
   JSON-validates them.
 
@@ -31,4 +29,4 @@ or just start a WaveMaker task and the skill triggers automatically.
 ```bash
 claude --plugin-dir ./legacy-to-wavemaker/wavemaker
 ```
-Invoke `/wavemaker:migrate-to-wavemaker` or the `wavemaker-migration` skill.
+Invoke `/wavemaker:migrate-to-wavemaker` or the `wavemaker-conventions` skill.
