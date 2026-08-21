@@ -51,6 +51,26 @@ already there). That **compiled CSS is what styles the app at runtime**; the `ov
 files are the **source tokens** Studio's theme editor reads. When hand-editing, change **both** the
 compiled CSS and the matching JSON so Studio and runtime stay in sync.
 
+### 8·React — Studio REGENERATES app.override.css; custom CSS + web-fonts belong in app.css
+Verified live on the React/PRISM runtime (platform.wavemaker.ai) — three hard-won rules:
+
+1. **On import, Studio recompiles `design-tokens/app.override.css` from `overrides/**` and DROPS
+   anything you hand-wrote there that isn't token-derived** — your custom classes (`.app-nav-link`,
+   `.btn-accent`, `.app-hero`, …) and any `@import url(...)` web-font are erased. The
+   `--wm-color-*` vars survive (compiled from `color.light.json`). → **Put custom CSS classes AND the
+   Google-Fonts `@import` in `app.css`** (which Studio does NOT regenerate and index.html loads at
+   runtime); have those rules read `var(--wm-color-*)`. Do NOT rely on hand-written rules living in
+   app.override.css — they will not survive the first import.
+2. **The React runtime renders widgets as Material-UI (MUI).** Invented component-appearance names do
+   **not** render — `variant="accent"` / `variant="outlined-accent"` produced unstyled buttons. Use
+   the built-in variants: **`variant="filled:primary"`** (solid brand colour via the MUI primary
+   token) and `variant="outlined"`. A widget's `class=` still lands on its root element, so
+   class-based styling in app.css works — but drive colour through the built-in variant + primary token.
+3. **Set the base font in `font.config.js` (`baseFont: '<Family>'`), not only in CSS** — the runtime
+   feeds `baseFont` into the MUI theme (MUI otherwise defaults to Roboto). Combine with the app.css
+   `@import` that loads the actual font files; a broad `#app-root [class*="Mui"] { font-family: … }`
+   rule forces it across MUI components.
+
 Folder structure (mirror exactly — same as the provided `design-tokens (3)` sample):
 ```
 design-tokens/

@@ -71,9 +71,30 @@ overrides role resolution. **Every role the query can emit must exist in `roles.
 ```
 
 ### 6d. Auth state on the client
-`App.Variables.loggedInUser.dataSet` = `{ name, id, isAuthenticated, roles[] }`. Gate widget
-visibility with `show="bind:App.Variables.loggedInUser.dataSet.isAuthenticated == true"` (or
-`== false`). Logout: `Actions.logoutAction.invoke()` / `App.Variables.logoutAction.invoke()`.
+`App.Variables.loggedInUser.dataSet` = `{ name, id, isAuthenticated, roles[] }` **when authenticated**.
+
+> **⚠️ For an ANONYMOUS visitor, `App.Variables.loggedInUser.dataSet` is `undefined`.** A markup
+> binding that reaches through it — `show="bind:App.Variables.loggedInUser.dataSet.isAuthenticated == false"`
+> or especially `...dataSet.roles.indexOf('seller') >= 0` — throws on the undefined at render and
+> **blanks the ENTIRE partial/page** (verified live: it left the whole header empty). Do NOT gate
+> `show` directly on `loggedInUser.dataSet.*`.
+>
+> **Instead compute null-safe app-scoped booleans and bind to those.** Declare `isLoggedIn` /
+> `isSeller` (`wm.Variable`, boolean, default `false`) in `app.variables.json`, recompute them in
+> `App.onPageReady` (fires per page), and gate widgets on `show="bind:App.Variables.isLoggedIn.dataSet == true"`:
+> ```js
+> App.onPageReady = function () { App.refreshAuthState(); };
+> App.refreshAuthState = function () {
+>   var lu = App.Variables.loggedInUser && App.Variables.loggedInUser.dataSet;   // may be undefined
+>   var roles = (lu && lu.roles) || [];
+>   App.Variables.isLoggedIn.dataSet = !!(lu && lu.isAuthenticated);
+>   App.Variables.isSeller.dataSet   = roles.indexOf('seller') >= 0 || roles.indexOf('admin') >= 0;
+> };
+> ```
+> These vars are always defined, so the bindings never throw. (In JS you may read
+> `loggedInUser.dataSet` directly as long as you null-guard with `&&`, as above.)
+
+Logout: `Actions.logoutAction.invoke()` / `App.Variables.logoutAction.invoke()`.
 In a custom Java service, get the caller via the autowired `SecurityService`
 (`securityService.isAuthenticated()`, `securityService.getUserId()` — returns the id as a **String**,
 NOT `getLoggedInUser().getUserId()`).

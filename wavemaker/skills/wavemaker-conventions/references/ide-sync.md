@@ -91,3 +91,12 @@ mvn wavemaker-workspace:push      # after you finish (or `sync` for both)
 > `service_<Service>.spring.xml` wiring) and the **security auth provider block** are best created in
 > Studio, then pulled down — see [`data-variables.md`](data-variables.md) §13 and
 > [`security.md`](security.md) §6.
+
+## Verifying in a run-preview — the URL is EPHEMERAL
+A Studio run-preview URL looks like `https://<host>/run-<id>/ent<...>/<Project>_master/react-preview/<Page>`.
+The `run-<id>` segment is tied to a **live run session and expires** — the same URL returns **HTTP 404**
+once that session ends, and (with security enforced) redirects to Login for an anonymous browser. So:
+- Don't treat a pasted run URL as a durable link; re-run the app in Studio to get a fresh one before
+  each verification pass.
+- After a `push`, reload/re-run in Studio so it redeploys and recompiles (`app.override.css`
+  regeneration, `font.config.js` fonts) — the previous preview instance will not reflect the push.
